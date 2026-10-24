@@ -1,0 +1,36 @@
+# Build outputs
+bin/
+obj/
+out/
+
+# User settings
+.vs/
+*.user
+*.suo
+
+# OS files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# IDE
+.idea/
+*.swp
+*.swo
+
+# NuGet
+packages/
+*.nupkg
+
+# Test results
+TestResults/
+*.trx
+
+# Generated icons
+GenerateIcons/
+icons/
+*.ico
+*.png
+
+# Logs
+*.log

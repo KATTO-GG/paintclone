@@ -1,0 +1,484 @@
+<Window x:Class="PaintNetClone.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PaintNetClone"
+        mc:Ignorable="d"
+        Title="Paint.NET Clone" Height="900" Width="1400"
+        WindowState="Maximized"
+        Background="{DynamicResource WindowBackgroundBrush}">
+
+    <Window.CommandBindings>
+        <CommandBinding Command="New" Executed="NewCommand_Executed"/>
+        <CommandBinding Command="Open" Executed="OpenCommand_Executed"/>
+        <CommandBinding Command="Save" Executed="SaveCommand_Executed"/>
+        <CommandBinding Command="SaveAs" Executed="SaveAsCommand_Executed"/>
+        <CommandBinding Command="Undo" Executed="UndoCommand_Executed" CanExecute="UndoCommand_CanExecute"/>
+        <CommandBinding Command="Redo" Executed="RedoCommand_Executed" CanExecute="RedoCommand_CanExecute"/>
+        <CommandBinding Command="Copy" Executed="CopyCommand_Executed"/>
+        <CommandBinding Command="Cut" Executed="CutCommand_Executed"/>
+        <CommandBinding Command="Paste" Executed="PasteCommand_Executed"/>
+        <CommandBinding Command="SelectAll" Executed="SelectAllCommand_Executed"/>
+        <CommandBinding Command="Delete" Executed="DeleteCommand_Executed"/>
+    </Window.CommandBindings>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- Menu Bar -->
+            <RowDefinition Height="Auto"/> <!-- Tool Bar -->
+            <RowDefinition Height="*"/>    <!-- Main Content -->
+            <RowDefinition Height="Auto"/> <!-- Status Bar -->
+        </Grid.RowDefinitions>
+
+        <!-- Menu Bar -->
+        <Menu Grid.Row="0" Background="{DynamicResource MenuBackgroundBrush}" Foreground="{DynamicResource MenuForegroundBrush}">
+            <MenuItem Header="_File">
+                <MenuItem Header="_New" Command="New" InputGestureText="Ctrl+N"/>
+                <MenuItem Header="_Open..." Command="Open" InputGestureText="Ctrl+O"/>
+                <Separator/>
+                <MenuItem Header="_Save" Command="Save" InputGestureText="Ctrl+S"/>
+                <MenuItem Header="Save _As..." Command="SaveAs" InputGestureText="Ctrl+Shift+S"/>
+                <Separator/>
+                <MenuItem Header="E_xit" Click="Exit_Click"/>
+            </MenuItem>
+            <MenuItem Header="_Edit">
+                <MenuItem Header="_Undo" Command="Undo" InputGestureText="Ctrl+Z"/>
+                <MenuItem Header="_Redo" Command="Redo" InputGestureText="Ctrl+Y"/>
+                <Separator/>
+                <MenuItem Header="Cu_t" Command="Cut" InputGestureText="Ctrl+X"/>
+                <MenuItem Header="_Copy" Command="Copy" InputGestureText="Ctrl+C"/>
+                <MenuItem Header="_Paste" Command="Paste" InputGestureText="Ctrl+V"/>
+                <Separator/>
+                <MenuItem Header="Select _All" Command="SelectAll" InputGestureText="Ctrl+A"/>
+                <MenuItem Header="_Delete" Command="Delete" InputGestureText="Del"/>
+                <Separator/>
+                <MenuItem Header="Preferen_ces..." Click="Preferences_Click"/>
+            </MenuItem>
+            <MenuItem Header="_View">
+                <MenuItem Header="_Zoom In" Click="ZoomIn_Click" InputGestureText="Ctrl++"/>
+                <MenuItem Header="Zoom _Out" Click="ZoomOut_Click" InputGestureText="Ctrl+-"/>
+                <MenuItem Header="_Actual Size" Click="ActualSize_Click" InputGestureText="Ctrl+0"/>
+                <MenuItem Header="_Fit to Window" Click="FitToWindow_Click" InputGestureText="Ctrl+Shift+0"/>
+                <Separator/>
+                <MenuItem Header="_Rulers" IsCheckable="True" IsChecked="True" Click="ToggleRulers_Click"/>
+                <MenuItem Header="_Grid" IsCheckable="True" Click="ToggleGrid_Click"/>
+                <MenuItem Header="_Pixel Grid" IsCheckable="True" Click="TogglePixelGrid_Click"/>
+            </MenuItem>
+            <MenuItem Header="_Image">
+                <MenuItem Header="_Resize..." Click="ResizeImage_Click"/>
+                <MenuItem Header="_Canvas Size..." Click="CanvasSize_Click"/>
+                <MenuItem Header="_Crop to Selection" Click="CropToSelection_Click"/>
+                <Separator/>
+                <MenuItem Header="_Flip Horizontal" Click="FlipHorizontal_Click"/>
+                <MenuItem Header="Flip _Vertical" Click="FlipVertical_Click"/>
+                <MenuItem Header="_Rotate 90° CW" Click="Rotate90Cw_Click"/>
+                <MenuItem Header="Rotate 90° _CCW" Click="Rotate90Ccw_Click"/>
+                <MenuItem Header="Rotate _180°" Click="Rotate180_Click"/>
+                <Separator/>
+                <MenuItem Header="Flatten" Click="Flatten_Click"/>
+            </MenuItem>
+            <MenuItem Header="_Layers">
+                <MenuItem Header="Add _New Layer" Click="AddNewLayer_Click" InputGestureText="Ctrl+Shift+N"/>
+                <MenuItem Header="Add _Group" Click="AddGroup_Click"/>
+                <MenuItem Header="_Duplicate Layer" Click="DuplicateLayer_Click" InputGestureText="Ctrl+D"/>
+                <MenuItem Header="_Delete Layer" Click="DeleteLayer_Click" InputGestureText="Del"/>
+                <Separator/>
+                <MenuItem Header="Move Layer _Up" Click="MoveLayerUp_Click" InputGestureText="Ctrl+]"/>
+                <MenuItem Header="Move Layer _Down" Click="MoveLayerDown_Click" InputGestureText="Ctrl+["/>
+                <Separator/>
+                <MenuItem Header="Layer _Properties..." Click="LayerProperties_Click" InputGestureText="F4"/>
+                <MenuItem Header="Merge _Down" Click="MergeDown_Click" InputGestureText="Ctrl+M"/>
+                <MenuItem Header="Merge Layer _Down" Click="MergeLayerDown_Click"/>
+            </MenuItem>
+            <MenuItem Header="_Adjustments">
+                <MenuItem Header="_Brightness / Contrast..." Click="BrightnessContrast_Click"/>
+                <MenuItem Header="_Hue / Saturation / Lightness..." Click="HueSaturationLightness_Click"/>
+                <MenuItem Header="_Levels..." Click="Levels_Click"/>
+                <Separator/>
+                <MenuItem Header="_Invert Colors" Click="InvertColors_Click" InputGestureText="Ctrl+I"/>
+                <MenuItem Header="_Grayscale" Click="Grayscale_Click" InputGestureText="Ctrl+Shift+G"/>
+                <MenuItem Header="_Sepia" Click="Sepia_Click"/>
+                <MenuItem Header="_Auto Level" Click="AutoLevel_Click"/>
+            </MenuItem>
+            <MenuItem Header="_Effects">
+                <MenuItem Header="_Blurs">
+                    <MenuItem Header="_Gaussian Blur..." Click="GaussianBlur_Click"/>
+                    <MenuItem Header="_Motion Blur..." Click="MotionBlur_Click"/>
+                    <MenuItem Header="_Radial Blur..." Click="RadialBlur_Click"/>
+                    <MenuItem Header="_Zoom Blur..." Click="ZoomBlur_Click"/>
+                </MenuItem>
+                <MenuItem Header="_Distort">
+                    <MenuItem Header="_Bulge..." Click="Bulge_Click"/>
+                    <MenuItem Header="_Twist..." Click="Twist_Click"/>
+                    <MenuItem Header="_Dents..." Click="Dents_Click"/>
+                    <MenuItem Header="_Frosted Glass..." Click="FrostedGlass_Click"/>
+                </MenuItem>
+                <MenuItem Header="_Noise">
+                    <MenuItem Header="_Add Noise..." Click="AddNoise_Click"/>
+                    <MenuItem Header="_Median..." Click="Median_Click"/>
+                </MenuItem>
+                <MenuItem Header="_Stylize">
+                    <MenuItem Header="_Emboss..." Click="Emboss_Click"/>
+                    <MenuItem Header="_Oil Painting..." Click="OilPainting_Click"/>
+                    <MenuItem Header="_Pencil Sketch..." Click="PencilSketch_Click"/>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="_Tools">
+                <MenuItem Header="_Paint Brush" Click="SelectTool_Click" Tag="PaintBrush" InputGestureText="B"/>
+                <MenuItem Header="_Eraser" Click="SelectTool_Click" Tag="Eraser" InputGestureText="E"/>
+                <MenuItem Header="_Pencil" Click="SelectTool_Click" Tag="Pencil" InputGestureText="P"/>
+                <MenuItem Header="Paint _Bucket" Click="SelectTool_Click" Tag="Fill" InputGestureText="F"/>
+                <MenuItem Header="_Gradient" Click="SelectTool_Click" Tag="Gradient" InputGestureText="G"/>
+                <Separator/>
+                <MenuItem Header="_Line" Click="SelectTool_Click" Tag="Line" InputGestureText="L"/>
+                <MenuItem Header="_Rectangle" Click="SelectTool_Click" Tag="Rectangle" InputGestureText="R"/>
+                <MenuItem Header="_Ellipse" Click="SelectTool_Click" Tag="Ellipse" InputGestureText="O"/>
+                <MenuItem Header="_Selection" Click="SelectTool_Click" Tag="Selection" InputGestureText="S"/>
+                <MenuItem Header="_Move" Click="SelectTool_Click" Tag="Move" InputGestureText="M"/>
+                <Separator/>
+                <MenuItem Header="_Zoom" Click="SelectTool_Click" Tag="Zoom" InputGestureText="Z"/>
+                <MenuItem Header="_Pan" Click="SelectTool_Click" Tag="Pan" InputGestureText="H"/>
+                <MenuItem Header="_Color Picker" Click="SelectTool_Click" Tag="ColorPicker" InputGestureText="I"/>
+                <MenuItem Header="_Text" Click="SelectTool_Click" Tag="Text" InputGestureText="T"/>
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Header="_About" Click="About_Click"/>
+            </MenuItem>
+        </Menu>
+
+        <!-- Tool Bar -->
+        <ToolBar Grid.Row="1" Background="{DynamicResource ToolBarBackgroundBrush}" Style="{DynamicResource ToolBarStyle}">
+            <Button Command="New" ToolTip="New (Ctrl+N)" Style="{DynamicResource ToolBarButtonStyle}">
+                <Image Source="Icons/New.png" Width="16" Height="16"/>
+            </Button>
+            <Button Command="Open" ToolTip="Open (Ctrl+O)" Style="{DynamicResource ToolBarButtonStyle}">
+                <Image Source="Icons/Open.png" Width="16" Height="16"/>
+            </Button>
+            <Button Command="Save" ToolTip="Save (Ctrl+S)" Style="{DynamicResource ToolBarButtonStyle}">
+                <Image Source="Icons/Save.png" Width="16" Height="16"/>
+            </Button>
+            <Separator/>
+            <Button Command="Undo" ToolTip="Undo (Ctrl+Z)" Style="{DynamicResource ToolBarButtonStyle}">
+                <Image Source="Icons/Undo.png" Width="16" Height="16"/>
+            </Button>
+            <Button Command="Redo" ToolTip="Redo (Ctrl+Y)" Style="{DynamicResource ToolBarButtonStyle}">
+                <Image Source="Icons/Redo.png" Width="16" Height="16"/>
+            </Button>
+            <Separator/>
+            <Button Command="Cut" ToolTip="Cut (Ctrl+X)" Style="{DynamicResource ToolBarButtonStyle}">
+                <Image Source="Icons/Cut.png" Width="16" Height="16"/>
+            </Button>
+            <Button Command="Copy" ToolTip="Copy (Ctrl+C)" Style="{DynamicResource ToolBarButtonStyle}">
+                <Image Source="Icons/Copy.png" Width="16" Height="16"/>
+            </Button>
+            <Button Command="Paste" ToolTip="Paste (Ctrl+V)" Style="{DynamicResource ToolBarButtonStyle}">
+                <Image Source="Icons/Paste.png" Width="16" Height="16"/>
+            </Button>
+            <Separator/>
+            <ComboBox x:Name="ToolComboBox" Width="150" SelectionChanged="ToolComboBox_SelectionChanged" ToolTip="Select Tool" Style="{DynamicResource ToolBarComboBoxStyle}"/>
+            <Separator/>
+            <Label Content="Brush Size:" VerticalAlignment="Center" Foreground="{DynamicResource ToolBarForegroundBrush}"/>
+            <Slider x:Name="BrushSizeSlider" Width="100" Minimum="1" Maximum="500" Value="10" ValueChanged="BrushSizeSlider_ValueChanged" ToolTip="Brush Size" Style="{DynamicResource ToolBarSliderStyle}"/>
+            <TextBox x:Name="BrushSizeTextBox" Width="40" Text="10" TextChanged="BrushSizeTextBox_TextChanged" ToolTip="Brush Size" Style="{DynamicResource ToolBarTextBoxStyle}"/>
+            <Separator/>
+            <Label Content="Hardness:" VerticalAlignment="Center" Foreground="{DynamicResource ToolBarForegroundBrush}"/>
+            <Slider x:Name="BrushHardnessSlider" Width="80" Minimum="0" Maximum="100" Value="50" ValueChanged="BrushHardnessSlider_ValueChanged" ToolTip="Brush Hardness" Style="{DynamicResource ToolBarSliderStyle}"/>
+            <Separator/>
+            <Label Content="Opacity:" VerticalAlignment="Center" Foreground="{DynamicResource ToolBarForegroundBrush}"/>
+            <Slider x:Name="BrushOpacitySlider" Width="80" Minimum="0" Maximum="100" Value="100" ValueChanged="BrushOpacitySlider_ValueChanged" ToolTip="Brush Opacity" Style="{DynamicResource ToolBarSliderStyle}"/>
+            <Separator/>
+            <Label Content="Blend Mode:" VerticalAlignment="Center" Foreground="{DynamicResource ToolBarForegroundBrush}"/>
+            <ComboBox x:Name="BlendModeComboBox" Width="120" SelectionChanged="BlendModeComboBox_SelectionChanged" ToolTip="Blend Mode" Style="{DynamicResource ToolBarComboBoxStyle}"/>
+        </ToolBar>
+
+        <!-- Main Content Area -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/> <!-- Tools Panel -->
+                <ColumnDefinition Width="*"/>    <!-- Canvas Area -->
+                <ColumnDefinition Width="Auto"/> <!-- Right Panels (Layers, Colors, History) -->
+            </Grid.ColumnDefinitions>
+
+            <!-- Tools Panel (Left) -->
+            <Border Grid.Column="0" Width="60" Background="{DynamicResource PanelBackgroundBrush}" BorderBrush="{DynamicResource PanelBorderBrush}" BorderThickness="0,0,1,0">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel x:Name="ToolsPanel" Orientation="Vertical" Margin="4">
+                        <!-- Tools will be populated dynamically -->
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+            <!-- Canvas Area (Center) -->
+            <Border Grid.Column="1" Background="{DynamicResource CanvasBackgroundBrush}" ClipToBounds="True">
+                <Grid x:Name="CanvasGrid">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/> <!-- Ruler Top -->
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/> <!-- Ruler Left -->
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Top Ruler -->
+                    <Border x:Name="TopRuler" Grid.Row="0" Grid.Column="1" Height="20" Background="{DynamicResource RulerBackgroundBrush}" BorderBrush="{DynamicResource RulerBorderBrush}" BorderThickness="0,0,0,1" Visibility="Visible">
+                        <Canvas x:Name="TopRulerCanvas"/>
+                    </Border>
+
+                    <!-- Left Ruler -->
+                    <Border x:Name="LeftRuler" Grid.Row="1" Grid.Column="0" Width="20" Background="{DynamicResource RulerBackgroundBrush}" BorderBrush="{DynamicResource RulerBorderBrush}" BorderThickness="0,0,1,0" Visibility="Visible">
+                        <Canvas x:Name="LeftRulerCanvas"/>
+                    </Border>
+
+                    <!-- Canvas Viewport -->
+                    <ScrollViewer x:Name="CanvasScrollViewer" Grid.Row="1" Grid.Column="1"
+                                  HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
+                                  Background="{DynamicResource CanvasBackgroundBrush}"
+                                  ScrollChanged="CanvasScrollViewer_ScrollChanged"
+                                  MouseWheel="CanvasScrollViewer_MouseWheel">
+                        <Canvas x:Name="CanvasCanvas" Background="Transparent">
+                            <Image x:Name="CanvasImage" Stretch="None"
+                                   MouseLeftButtonDown="CanvasImage_MouseLeftButtonDown"
+                                   MouseLeftButtonUp="CanvasImage_MouseLeftButtonUp"
+                                   MouseMove="CanvasImage_MouseMove"
+                                   MouseRightButtonDown="CanvasImage_MouseRightButtonDown"
+                                   MouseRightButtonUp="CanvasImage_MouseRightButtonUp"
+                                   MouseWheel="CanvasImage_MouseWheel"/>
+                        </Canvas>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+
+            <!-- Right Panels -->
+            <Border Grid.Column="2" Width="280" Background="{DynamicResource PanelBackgroundBrush}" BorderBrush="{DynamicResource PanelBorderBrush}" BorderThickness="1,0,0,0">
+                <TabControl x:Name="RightTabControl" Style="{DynamicResource TabControlStyle}">
+                    <!-- Layers Tab -->
+                    <TabItem Header="Layers" Style="{DynamicResource TabItemStyle}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/> <!-- Layer Toolbar -->
+                                <RowDefinition Height="*"/>    <!-- Layer List -->
+                                <RowDefinition Height="Auto"/> <!-- Layer Properties -->
+                            </Grid.RowDefinitions>
+
+                            <!-- Layer Toolbar -->
+                            <ToolBar Grid.Row="0" Style="{DynamicResource PanelToolBarStyle}" Background="Transparent">
+                                <Button x:Name="AddLayerButton" ToolTip="Add New Layer (Ctrl+Shift+N)" Click="AddLayerButton_Click" Style="{DynamicResource PanelButtonStyle}">
+                                    <Image Source="Icons/LayerAdd.png" Width="16" Height="16"/>
+                                </Button>
+                                <Button x:Name="AddGroupButton" ToolTip="Add Group" Click="AddGroupButton_Click" Style="{DynamicResource PanelButtonStyle}">
+                                    <Image Source="Icons/GroupAdd.png" Width="16" Height="16"/>
+                                </Button>
+                                <Button x:Name="DuplicateLayerButton" ToolTip="Duplicate Layer (Ctrl+D)" Click="DuplicateLayerButton_Click" Style="{DynamicResource PanelButtonStyle}">
+                                    <Image Source="Icons/LayerDuplicate.png" Width="16" Height="16"/>
+                                </Button>
+                                <Button x:Name="DeleteLayerButton" ToolTip="Delete Layer (Del)" Click="DeleteLayerButton_Click" Style="{DynamicResource PanelButtonStyle}">
+                                    <Image Source="Icons/LayerDelete.png" Width="16" Height="16"/>
+                                </Button>
+                                <Separator/>
+                                <Button x:Name="MoveLayerUpButton" ToolTip="Move Layer Up (Ctrl+])" Click="MoveLayerUpButton_Click" Style="{DynamicResource PanelButtonStyle}">
+                                    <Image Source="Icons/Up.png" Width="16" Height="16"/>
+                                </Button>
+                                <Button x:Name="MoveLayerDownButton" ToolTip="Move Layer Down (Ctrl+[)" Click="MoveLayerDownButton_Click" Style="{DynamicResource PanelButtonStyle}">
+                                    <Image Source="Icons/Down.png" Width="16" Height="16"/>
+                                </Button>
+                                <Separator/>
+                                <Button x:Name="MergeDownButton" ToolTip="Merge Down (Ctrl+M)" Click="MergeDownButton_Click" Style="{DynamicResource PanelButtonStyle}">
+                                    <Image Source="Icons/MergeDown.png" Width="16" Height="16"/>
+                                </Button>
+                                <Button x:Name="FlattenButton" ToolTip="Flatten" Click="FlattenButton_Click" Style="{DynamicResource PanelButtonStyle}">
+                                    <Image Source="Icons/Flatten.png" Width="16" Height="16"/>
+                                </Button>
+                            </ToolBar>
+
+                            <!-- Layer List -->
+                            <ListView x:Name="LayersListView" Grid.Row="1"
+                                      Background="Transparent" BorderThickness="0"
+                                      SelectionMode="Single"
+                                      SelectionChanged="LayersListView_SelectionChanged"
+                                      MouseDoubleClick="LayersListView_MouseDoubleClick"
+                                      ContextMenuOpening="LayersListView_ContextMenuOpening"
+                                      Style="{DynamicResource LayerListViewStyle}">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border x:Name="LayerItemBorder" Height="32" Background="Transparent" Margin="2">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="32"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <CheckBox x:Name="VisibilityCheckBox" Grid.Column="0"
+                                                          IsChecked="{Binding Visible, Mode=TwoWay}"
+                                                          VerticalAlignment="Center" HorizontalAlignment="Center"
+                                                          Checked="VisibilityCheckBox_Checked"
+                                                          Unchecked="VisibilityCheckBox_Unchecked"
+                                                          Style="{DynamicResource LayerVisibilityCheckBoxStyle}"/>
+                                                <TextBlock Grid.Column="1" Text="{Binding Name}"
+                                                           VerticalAlignment="Center" Margin="4,0,0,0"
+                                                           Foreground="{DynamicResource PanelForegroundBrush}"
+                                                           TextTrimming="CharacterEllipsis"/>
+                                                <ComboBox x:Name="BlendModeComboBox" Grid.Column="2" Width="100" Margin="4,0,4,0"
+                                                          ItemsSource="{Binding BlendModes}"
+                                                          SelectedItem="{Binding BlendMode, Mode=TwoWay}"
+                                                          VerticalAlignment="Center"
+                                                          FontSize="10"
+                                                          Style="{DynamicResource LayerBlendModeComboBoxStyle}"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+
+                            <!-- Layer Properties -->
+                            <Border Grid.Row="2" Background="{DynamicResource PanelSubBackgroundBrush}" BorderBrush="{DynamicResource PanelBorderBrush}" BorderThickness="0,1,0,0" Padding="8">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                        <Label Content="Opacity:" Width="60" Foreground="{DynamicResource PanelForegroundBrush}"/>
+                                        <Slider x:Name="LayerOpacitySlider" Width="180" Minimum="0" Maximum="100" Value="100" ValueChanged="LayerOpacitySlider_ValueChanged" Style="{DynamicResource PanelSliderStyle}"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                        <Label Content="Blend Mode:" Width="80" Foreground="{DynamicResource PanelForegroundBrush}"/>
+                                        <ComboBox x:Name="LayerBlendModeComboBox" Width="180" SelectionChanged="LayerBlendModeComboBox_SelectionChanged" Style="{DynamicResource PanelComboBoxStyle}"/>
+                                    </StackPanel>
+                                    <CheckBox x:Name="LayerVisibleCheckBox" Content="Visible" Checked="LayerVisibleCheckBox_Checked" Unchecked="LayerVisibleCheckBox_Unchecked" Foreground="{DynamicResource PanelForegroundBrush}"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </TabItem>
+
+                    <!-- Colors Tab -->
+                    <TabItem Header="Colors" Style="{DynamicResource TabItemStyle}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Color Wheels / Pickers -->
+                            <Border Grid.Row="0" Margin="8" Padding="8" Background="{DynamicResource PanelSubBackgroundBrush}" CornerRadius="4">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Primary Color -->
+                                    <StackPanel Grid.Column="0">
+                                        <Label Content="Primary Color" Foreground="{DynamicResource PanelForegroundBrush}" FontWeight="Bold"/>
+                                        <Border x:Name="PrimaryColorPreview" Width="64" Height="64" Background="Black" BorderBrush="{DynamicResource PanelBorderBrush}" BorderThickness="1" CornerRadius="4" Margin="0,4,0,0" MouseLeftButtonDown="PrimaryColorPreview_MouseLeftButtonDown"/>
+                                        <TextBlock x:Name="PrimaryColorHex" Text="#000000" Foreground="{DynamicResource PanelForegroundBrush}" FontFamily="Consolas" Margin="0,4,0,0"/>
+                                    </StackPanel>
+
+                                    <!-- Secondary Color -->
+                                    <StackPanel Grid.Column="1">
+                                        <Label Content="Secondary Color" Foreground="{DynamicResource PanelForegroundBrush}" FontWeight="Bold"/>
+                                        <Border x:Name="SecondaryColorPreview" Width="64" Height="64" Background="White" BorderBrush="{DynamicResource PanelBorderBrush}" BorderThickness="1" CornerRadius="4" Margin="0,4,0,0" MouseLeftButtonDown="SecondaryColorPreview_MouseLeftButtonDown"/>
+                                        <TextBlock x:Name="SecondaryColorHex" Text="#FFFFFF" Foreground="{DynamicResource PanelForegroundBrush}" FontFamily="Consolas" Margin="0,4,0,0"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <!-- Color Wheel / Palette -->
+                            <TabControl Grid.Row="1" Margin="8,0,8,8" Style="{DynamicResource SubTabControlStyle}">
+                                <TabItem Header="Wheel" Style="{DynamicResource SubTabItemStyle}">
+                                    <Border x:Name="ColorWheelContainer" Background="Transparent"/>
+                                </TabItem>
+                                <TabItem Header="Palette" Style="{DynamicResource SubTabItemStyle}">
+                                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                        <WrapPanel x:Name="ColorPalettePanel" Margin="4"/>
+                                    </ScrollViewer>
+                                </TabItem>
+                                <TabItem Header="RGB" Style="{DynamicResource SubTabItemStyle}">
+                                    <StackPanel Margin="8">
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                            <Label Content="R:" Width="20" Foreground="{DynamicResource PanelForegroundBrush}"/>
+                                            <Slider x:Name="RedSlider" Width="200" Minimum="0" Maximum="255" Value="0" ValueChanged="RgbSlider_ValueChanged" Style="{DynamicResource PanelSliderStyle}"/>
+                                            <TextBox x:Name="RedTextBox" Width="40" Text="0" TextChanged="RgbTextBox_TextChanged" Style="{DynamicResource PanelTextBoxStyle}"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                            <Label Content="G:" Width="20" Foreground="{DynamicResource PanelForegroundBrush}"/>
+                                            <Slider x:Name="GreenSlider" Width="200" Minimum="0" Maximum="255" Value="0" ValueChanged="RgbSlider_ValueChanged" Style="{DynamicResource PanelSliderStyle}"/>
+                                            <TextBox x:Name="GreenTextBox" Width="40" Text="0" TextChanged="RgbTextBox_TextChanged" Style="{DynamicResource PanelTextBoxStyle}"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                            <Label Content="B:" Width="20" Foreground="{DynamicResource PanelForegroundBrush}"/>
+                                            <Slider x:Name="BlueSlider" Width="200" Minimum="0" Maximum="255" Value="0" ValueChanged="RgbSlider_ValueChanged" Style="{DynamicResource PanelSliderStyle}"/>
+                                            <TextBox x:Name="BlueTextBox" Width="40" Text="0" TextChanged="RgbTextBox_TextChanged" Style="{DynamicResource PanelTextBoxStyle}"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                            <Label Content="A:" Width="20" Foreground="{DynamicResource PanelForegroundBrush}"/>
+                                            <Slider x:Name="AlphaSlider" Width="200" Minimum="0" Maximum="255" Value="255" ValueChanged="RgbSlider_ValueChanged" Style="{DynamicResource PanelSliderStyle}"/>
+                                            <TextBox x:Name="AlphaTextBox" Width="40" Text="255" TextChanged="RgbTextBox_TextChanged" Style="{DynamicResource PanelTextBoxStyle}"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </TabItem>
+                                <TabItem Header="HSV" Style="{DynamicResource SubTabItemStyle}">
+                                    <StackPanel Margin="8">
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                            <Label Content="H:" Width="20" Foreground="{DynamicResource PanelForegroundBrush}"/>
+                                            <Slider x:Name="HueSlider" Width="200" Minimum="0" Maximum="360" Value="0" ValueChanged="HsvSlider_ValueChanged" Style="{DynamicResource PanelSliderStyle}"/>
+                                            <TextBox x:Name="HueTextBox" Width="40" Text="0" TextChanged="HsvTextBox_TextChanged" Style="{DynamicResource PanelTextBoxStyle}"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                            <Label Content="S:" Width="20" Foreground="{DynamicResource PanelForegroundBrush}"/>
+                                            <Slider x:Name="SaturationSlider" Width="200" Minimum="0" Maximum="100" Value="0" ValueChanged="HsvSlider_ValueChanged" Style="{DynamicResource PanelSliderStyle}"/>
+                                            <TextBox x:Name="SaturationTextBox" Width="40" Text="0" TextChanged="HsvTextBox_TextChanged" Style="{DynamicResource PanelTextBoxStyle}"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                            <Label Content="V:" Width="20" Foreground="{DynamicResource PanelForegroundBrush}"/>
+                                            <Slider x:Name="ValueSlider" Width="200" Minimum="0" Maximum="100" Value="100" ValueChanged="HsvSlider_ValueChanged" Style="{DynamicResource PanelSliderStyle}"/>
+                                            <TextBox x:Name="ValueTextBox" Width="40" Text="100" TextChanged="HsvTextBox_TextChanged" Style="{DynamicResource PanelTextBoxStyle}"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </TabItem>
+                            </TabControl>
+
+                            <!-- Swap / Reset Buttons -->
+                            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,8">
+                                <Button x:Name="SwapColorsButton" Content="Swap (X)" Width="80" Margin="4" Click="SwapColorsButton_Click" Style="{DynamicResource PanelButtonStyle}"/>
+                                <Button x:Name="ResetColorsButton" Content="Reset (D)" Width="80" Margin="4" Click="ResetColorsButton_Click" Style="{DynamicResource PanelButtonStyle}"/>
+                            </StackPanel>
+                        </Grid>
+                    </TabItem>
+
+                    <!-- History Tab -->
+                    <TabItem Header="History" Style="{DynamicResource TabItemStyle}">
+                        <ListView x:Name="HistoryListView" Background="Transparent" BorderThickness="0" Style="{DynamicResource HistoryListViewStyle}">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" Padding="8,4" Foreground="{DynamicResource PanelForegroundBrush}"/>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </TabItem>
+                </TabControl>
+            </Border>
+        </Grid>
+
+        <!-- Status Bar -->
+        <StatusBar Grid.Row="3" Background="{DynamicResource StatusBarBackgroundBrush}" Foreground="{DynamicResource StatusBarForegroundBrush}">
+            <StatusBarItem>
+                <TextBlock x:Name="StatusText" Text="Ready"/>
+            </StatusBarItem>
+            <Separator/>
+            <StatusBarItem>
+                <TextBlock x:Name="CursorPositionText" Text="X: 0, Y: 0"/>
+            </StatusBarItem>
+            <Separator/>
+            <StatusBarItem>
+                <TextBlock x:Name="SelectionSizeText" Text=""/>
+            </StatusBarItem>
+            <Separator/>
+            <StatusBarItem HorizontalAlignment="Right">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock x:Name="ZoomText" Text="100%" Width="60" TextAlignment="Right"/>
+                    <Slider x:Name="ZoomSlider" Width="100" Minimum="10" Maximum="1600" Value="100" ValueChanged="ZoomSlider_ValueChanged" Style="{DynamicResource StatusBarSliderStyle}"/>
+                    <Button Content="100%" Width="50" Click="ActualSizeButton_Click" Style="{DynamicResource StatusBarButtonStyle}"/>
+                </StackPanel>
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
+</Window>
