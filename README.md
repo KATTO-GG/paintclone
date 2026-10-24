@@ -11,9 +11,6 @@ A functional Paint.NET clone built with WPF (.NET 8). Features layer-based editi
 - **Undo/Redo**: Full history with memento pattern
 - **Custom Color Picker**: RGB/HSV sliders with hex input
 
-## Screenshots
-
-*(Add screenshots here)*
 
 ## Requirements
 
